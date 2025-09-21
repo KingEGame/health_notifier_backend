@@ -464,3 +464,287 @@ curl "http://localhost:5000/api/risk-patients/summary"
 ```bash
 curl "http://localhost:5000/api/risk-patients/1"
 ```
+
+## Comprehensive Patient Data API
+
+### Get All Patients with Risks and Recommendations
+```bash
+# Get all patients with comprehensive risk data (with pagination by default)
+curl "http://localhost:5000/api/patients/with-risks"
+
+# Get ALL patients without pagination (processes all patients first, then returns all)
+curl "http://localhost:5000/api/patients/with-risks?no_pagination=true"
+
+# With pagination
+curl "http://localhost:5000/api/patients/with-risks?page=1&per_page=20"
+
+# Filter by risk level (processes all patients, then filters)
+curl "http://localhost:5000/api/patients/with-risks?risk_level=high"
+
+# Filter by location (zip code)
+curl "http://localhost:5000/api/patients/with-risks?location=10001"
+
+# Include AI suggestions (default: true)
+curl "http://localhost:5000/api/patients/with-risks?include_ai_suggestions=true"
+
+# Include notifications (default: true)
+curl "http://localhost:5000/api/patients/with-risks?include_notifications=true"
+
+# Combined filters with all patients
+curl "http://localhost:5000/api/patients/with-risks?risk_level=medium&location=10001&no_pagination=true"
+
+# Combined filters with pagination
+curl "http://localhost:5000/api/patients/with-risks?risk_level=medium&location=10001&page=1&per_page=10"
+```
+
+### Stream All Patients with Risks (Real-time Processing)
+```bash
+# Stream all patients with comprehensive risk data (real-time processing)
+curl "http://localhost:5000/api/patients/with-risks/stream"
+
+# Stream with custom batch size (default: 10 patients per batch)
+curl "http://localhost:5000/api/patients/with-risks/stream?batch_size=5"
+
+# Stream with filters
+curl "http://localhost:5000/api/patients/with-risks/stream?risk_level=high&batch_size=20"
+
+# Stream by location
+curl "http://localhost:5000/api/patients/with-risks/stream?location=10001&batch_size=15"
+
+# Stream without AI suggestions for faster processing
+curl "http://localhost:5000/api/patients/with-risks/stream?include_ai_suggestions=false&batch_size=25"
+```
+
+### Get Comprehensive Patient Statistics
+```bash
+# Get basic statistics
+curl "http://localhost:5000/api/patients/statistics"
+
+# Get detailed breakdown including medications and conditions
+curl "http://localhost:5000/api/patients/statistics?include_detailed_breakdown=true"
+
+# Filter by location
+curl "http://localhost:5000/api/patients/statistics?location=10001"
+
+# Combined filters
+curl "http://localhost:5000/api/patients/statistics?location=10001&include_detailed_breakdown=true"
+```
+
+### Response Examples
+
+#### Patients with Risks Response
+```json
+{
+  "success": true,
+  "patients": [
+    {
+      "patient_id": 1,
+      "name": "Jane Doe",
+      "age": 28,
+      "zip_code": "10001",
+      "phone_number": "+1234567890",
+      "email": "jane@example.com",
+      "address": "123 Main St",
+      "pregnancy_weeks": 24,
+      "trimester": 2,
+      "pregnancy_icd10": "Z34.90",
+      "pregnancy_description": "Encounter for supervision of normal pregnancy",
+      "comorbidity_icd10": "E11.9",
+      "comorbidity_description": "Type 2 diabetes mellitus without complications",
+      "conditions": [
+        "Z34.90: Encounter for supervision of normal pregnancy",
+        "E11.9: Type 2 diabetes mellitus without complications"
+      ],
+      "medications": ["Metformin", "Folic Acid"],
+      "medication_notes": "Take with food",
+      "ndc_codes": ["12345-678-90", "98765-432-10"],
+      "risk_level": "medium",
+      "risk_score": 6.5,
+      "heat_wave_risk": false,
+      "risk_factors": {
+        "age_risk": "low",
+        "trimester_risk": "medium",
+        "location_risk": "low",
+        "conditions_risk": "high",
+        "medications_risk": "low"
+      },
+      "weather_conditions": {
+        "temperature": 25,
+        "feels_like": 25,
+        "humidity": 50,
+        "description": "Weather API disabled"
+      },
+      "is_high_risk_age": true,
+      "age_group": "optimal",
+      "ai_suggestions": {
+        "recommendations": [
+          "Monitor blood sugar levels closely",
+          "Regular prenatal check-ups recommended",
+          "Follow diabetic diet guidelines"
+        ],
+        "priority_actions": [
+          "Schedule endocrinologist consultation",
+          "Monitor fetal development"
+        ]
+      },
+      "notifications": [
+        {
+          "id": 1,
+          "message": "Regular check-up reminder",
+          "notification_type": "reminder",
+          "priority": "medium",
+          "status": "sent"
+        }
+      ],
+      "risk_history": [
+        {
+          "id": 1,
+          "risk_level": "medium",
+          "risk_score": 6.5,
+          "assessment_date": "2024-01-15T10:30:00"
+        }
+      ],
+      "created_at": "2024-01-01T00:00:00",
+      "updated_at": "2024-01-15T10:30:00"
+    }
+  ],
+  "pagination": {
+    "total": 100,
+    "pages": 5,
+    "current_page": 1,
+    "per_page": 20,
+    "has_next": true,
+    "has_prev": false
+  },
+  "summary": {
+    "total_patients": 20,
+    "total_processed_patients": 100,
+    "total_available_patients": 100,
+    "risk_distribution": {
+      "low": 5,
+      "medium": 12,
+      "high": 3
+    },
+    "patients_at_risk": 15,
+    "filters_applied": {
+      "risk_level": null,
+      "location": null,
+      "include_ai_suggestions": true,
+      "include_notifications": true,
+      "no_pagination": false
+    }
+  }
+}
+```
+
+#### Streaming Response Examples
+
+The streaming API returns data in NDJSON format (newline-delimited JSON), where each line is a separate JSON object:
+
+**Initial Metadata:**
+```json
+{"type": "metadata", "total_patients": 1000, "batch_size": 10, "filters_applied": {"risk_level": null, "location": null, "include_ai_suggestions": true, "include_notifications": true}}
+```
+
+**Patient Batch:**
+```json
+{"type": "batch", "patients": [{"patient_id": 1, "name": "Jane Doe", "age": 28, "risk_level": "medium", "risk_score": 6.5, "ai_suggestions": {"recommendations": ["Monitor blood sugar levels"]}, {"patient_id": 2, "name": "John Smith", "age": 32, "risk_level": "high", "risk_score": 8.2, "ai_suggestions": {"recommendations": ["Immediate consultation needed"]}}], "processed_count": 10, "total_patients": 1000}
+```
+
+**Final Summary:**
+```json
+{"type": "summary", "total_processed": 1000, "total_available_patients": 1000, "risk_distribution": {"low": 300, "medium": 500, "high": 200}, "patients_at_risk": 700, "filters_applied": {"risk_level": null, "location": null, "include_ai_suggestions": true, "include_notifications": true}}
+```
+
+**Error Response:**
+```json
+{"type": "error", "error": "Failed to generate patient stream"}
+```
+
+#### Statistics Response
+```json
+{
+  "success": true,
+  "statistics": {
+    "total_patients": 100,
+    "risk_distribution": {
+      "low": 30,
+      "medium": 50,
+      "high": 20
+    },
+    "risk_percentages": {
+      "low": 30.0,
+      "medium": 50.0,
+      "high": 20.0
+    },
+    "patients_at_risk": 70,
+    "patients_at_risk_percentage": 70.0,
+    "extreme_heat_risk": 15,
+    "extreme_heat_risk_percentage": 15.0,
+    "average_risk_score": 5.8,
+    "age_distribution": {
+      "under_21": 10,
+      "21_30": 40,
+      "31_35": 35,
+      "over_35": 15
+    },
+    "age_percentages": {
+      "under_21": 10.0,
+      "21_30": 40.0,
+      "31_35": 35.0,
+      "over_35": 15.0
+    },
+    "trimester_distribution": {
+      "1": 25,
+      "2": 35,
+      "3": 30,
+      "unknown": 10
+    },
+    "trimester_percentages": {
+      "1": 25.0,
+      "2": 35.0,
+      "3": 30.0,
+      "unknown": 10.0
+    },
+    "medication_risks": {
+      "Metformin": {
+        "count": 15,
+        "risk_levels": {
+          "low": 5,
+          "medium": 8,
+          "high": 2
+        }
+      },
+      "Folic Acid": {
+        "count": 80,
+        "risk_levels": {
+          "low": 60,
+          "medium": 18,
+          "high": 2
+        }
+      }
+    },
+    "condition_risks": {
+      "Z34.90: Encounter for supervision of normal pregnancy": {
+        "count": 90,
+        "risk_levels": {
+          "low": 30,
+          "medium": 45,
+          "high": 15
+        }
+      }
+    },
+    "top_medications": [
+      ["Folic Acid", {"count": 80, "risk_levels": {"low": 60, "medium": 18, "high": 2}}],
+      ["Metformin", {"count": 15, "risk_levels": {"low": 5, "medium": 8, "high": 2}}]
+    ],
+    "top_conditions": [
+      ["Z34.90: Encounter for supervision of normal pregnancy", {"count": 90, "risk_levels": {"low": 30, "medium": 45, "high": 15}}]
+    ],
+    "filters_applied": {
+      "location": null,
+      "include_detailed_breakdown": true
+    }
+  }
+}
+```

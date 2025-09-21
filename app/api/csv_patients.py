@@ -143,7 +143,7 @@ def delete_patient(patient_id):
             'error': 'Failed to delete patient'
         }), 500
 
-@csv_patients_bp.route('/patients', methods=['GET'])
+@csv_patients_bp.route('/csv-patients', methods=['GET'])
 def get_all_patients():
     """Get all patients with optional filtering"""
     try:

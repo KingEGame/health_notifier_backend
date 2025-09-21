@@ -2,6 +2,8 @@ import requests
 from flask import current_app
 from app.utils.exceptions import ExternalAPIException
 import logging
+import time
+from functools import lru_cache
 
 logger = logging.getLogger(__name__)
 
@@ -9,15 +11,21 @@ class WeatherService:
     """Service for weather data integration"""
     
     @staticmethod
+    @lru_cache(maxsize=100)
     def get_weather_data(zip_code):
-        """Get weather data by zip code using OpenWeatherMap API"""
+        """Get weather data by zip code using OpenWeatherMap API with caching"""
         try:
             # Try OneCall API first (more comprehensive data)
             return WeatherService.get_onecall_weather_data(zip_code)
         except Exception as e:
             logger.warning(f"OneCall API failed, trying Current Weather API: {e}")
             # Fallback to Current Weather API
-            return WeatherService.get_current_weather_data(zip_code)
+            try:
+                return WeatherService.get_current_weather_data(zip_code)
+            except Exception as e2:
+                logger.warning(f"Current Weather API also failed: {e2}")
+                # Return default weather data to prevent API hanging
+                return WeatherService._get_default_weather_data()
     
     @staticmethod
     def get_onecall_weather_data(zip_code):
@@ -29,7 +37,7 @@ class WeatherService:
                 'appid': current_app.config['WEATHER_API_KEY'],
                 'units': 'metric'
             }
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, timeout=5)
             
             if response.status_code == 200:
                 data = response.json()
@@ -51,7 +59,7 @@ class WeatherService:
                 'appid': current_app.config['WEATHER_API_KEY'],
                 'units': 'metric'
             }
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, timeout=5)
             
             if response.status_code == 200:
                 data = response.json()
@@ -75,7 +83,7 @@ class WeatherService:
                 'units': 'metric',
                 'cnt': days * 8  # 8 forecasts per day (every 3 hours)
             }
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, timeout=5)
             
             if response.status_code == 200:
                 data = response.json()
@@ -98,7 +106,7 @@ class WeatherService:
                 'units': 'metric',
                 'exclude': 'minutely,hourly,daily'
             }
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, timeout=5)
             
             if response.status_code == 200:
                 data = response.json()

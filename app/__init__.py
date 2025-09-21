@@ -24,13 +24,13 @@ def create_app(config_name='development'):
     
     # Register blueprints
     from app.api import api_bp
-    from app.api.risk_patients import risk_patients_bp
+    from app.api.csv_risk_patients import csv_risk_patients_bp
     from app.api.health import health_bp
-    from app.api.patients import patients_bp
+    from app.api.csv_patients import csv_patients_bp
     app.register_blueprint(api_bp, url_prefix='/api')
-    app.register_blueprint(risk_patients_bp, url_prefix='/api')
+    app.register_blueprint(csv_risk_patients_bp, url_prefix='/api')
     app.register_blueprint(health_bp, url_prefix='/api')
-    app.register_blueprint(patients_bp, url_prefix='/api')
+    app.register_blueprint(csv_patients_bp, url_prefix='/api')
     
     # Register error handlers
     from app.errors import register_error_handlers

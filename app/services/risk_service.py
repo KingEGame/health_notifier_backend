@@ -74,7 +74,7 @@ class RiskAssessmentService:
         factors['age_risk'] = age_risk['level']
         
         # Trimester factor
-        trimester_risk = RiskAssessmentService._calculate_trimester_risk(patient.trimester)
+        trimester_risk = RiskAssessmentService._calculate_trimester_risk(patient._calculate_trimester())
         risk_score += trimester_risk['score']
         factors['trimester_risk'] = trimester_risk['level']
         

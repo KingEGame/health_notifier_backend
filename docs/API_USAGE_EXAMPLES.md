@@ -329,7 +329,7 @@ GET /api/risk-patients/123/comprehensive
 }
 ```
 
-#### Risk summary
+#### Risk summary (Limited to 10 patients for performance)
 ```bash
 GET /api/risk-patients/summary
 ```
@@ -339,23 +339,61 @@ GET /api/risk-patients/summary
 {
   "success": true,
   "summary": {
-    "total_patients": 150,
+    "total_patients": 10,
+    "total_available_patients": 1000,
+    "patients_limited_to": 10,
     "risk_distribution": {
-      "low": 105,
-      "medium": 30,
-      "high": 15
+      "high": 10,
+      "medium": 0,
+      "low": 0
     },
-    "patients_at_risk": 45,
-    "extreme_heat_risk": 12,
-    "average_risk_score": 2.3,
+    "patients_at_risk": 10,
+    "extreme_heat_risk": 0,
+    "average_risk_score": 12.5,
     "risk_percentages": {
-      "low": 70.0,
-      "medium": 20.0,
-      "high": 10.0
+      "high": 100.0,
+      "medium": 0.0,
+      "low": 0.0
     }
   }
 }
 ```
+
+**Note:** The summary is calculated based on the first 10 patients for performance optimization. The `total_available_patients` field shows the actual total number of patients in the system.
+
+## Recent Updates and Fixes
+
+### Version 1.1.0 - Performance and Data Enhancements
+
+#### ✅ **Fixed Issues:**
+1. **Trimester Calculation Error**: Fixed `'CSVPatient' object has no attribute 'trimester'` error by properly calling `_calculate_trimester()` method
+2. **API Performance**: Temporarily disabled Weather API to prevent hanging and improve response times
+3. **Data Limitation**: Limited patient results to 10 patients for better performance and faster API responses
+
+#### 🚀 **New Features:**
+1. **Enhanced Patient Data**: Added comprehensive patient information including:
+   - Trimester calculation (1st, 2nd, 3rd)
+   - Age group classification (optimal/outside_optimal)
+   - Detailed medication information with NDC codes
+   - Complete medical conditions and ICD10 codes
+   - Contact information and timestamps
+
+2. **Performance Optimizations**:
+   - Limited API responses to 10 patients for faster loading
+   - Added caching for weather data (when enabled)
+   - Reduced timeout values for external API calls
+   - Fallback data when external services are unavailable
+
+3. **Improved API Responses**:
+   - Added `total_available_patients` field to show actual patient count
+   - Added `patients_limited_to` field to indicate performance limitation
+   - Enhanced error handling and logging
+
+#### 📊 **Current API Status:**
+- **Weather API**: Temporarily disabled (returns default values)
+- **AI Suggestions**: Available (requires GEMINI_API_KEY)
+- **Patient Data**: Full 1000 patients available, API returns first 10
+- **Risk Assessment**: Fully functional with comprehensive scoring
 
 ## API Keys Configuration
 
@@ -383,10 +421,46 @@ You can configure different Gemini models by setting the `GEMINI_MODEL` environm
 
 1. **AI suggestions**: Require GEMINI_API_KEY configuration. If the key is not configured, fallback recommendations are returned.
 
-2. **Weather data**: Requires WEATHER_API_KEY configuration. If the API is unavailable, default values are returned.
+2. **Weather data**: Currently disabled for performance. Returns default values to prevent API hanging.
 
-3. **Filtering**: All endpoints support filtering by various parameters.
+3. **Patient Data Limitation**: API returns only first 10 patients for optimal performance. Use individual patient endpoints for specific data.
 
-4. **Pagination**: Pagination is used for large datasets.
+4. **Filtering**: All endpoints support filtering by various parameters (risk_level, location, etc.).
 
-5. **Error handling**: All endpoints return structured responses with success/error information.
+5. **Comprehensive Patient Information**: Each patient response includes:
+   - Complete medical history and conditions
+   - Detailed medication information with NDC codes
+   - Pregnancy details with trimester calculation
+   - Risk assessment with detailed scoring
+   - Contact information and timestamps
+
+6. **Error handling**: All endpoints return structured responses with success/error information and detailed logging.
+
+7. **Performance Optimized**: Fast response times with limited data sets for better user experience.
+
+## Quick Start Examples
+
+### Get Risk Patients (Basic)
+```bash
+curl "http://localhost:5000/api/risk-patients"
+```
+
+### Get Risk Patients with AI Suggestions
+```bash
+curl "http://localhost:5000/api/risk-patients?include_ai_suggestions=true"
+```
+
+### Get High-Risk Patients Only
+```bash
+curl "http://localhost:5000/api/risk-patients?risk_level=high"
+```
+
+### Get Risk Summary
+```bash
+curl "http://localhost:5000/api/risk-patients/summary"
+```
+
+### Get Specific Patient Details
+```bash
+curl "http://localhost:5000/api/risk-patients/1"
+```

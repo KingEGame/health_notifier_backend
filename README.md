@@ -6,11 +6,27 @@ A comprehensive health monitoring system for pregnant women with climate data in
 
 - **Patient Management**: Complete CRUD operations for patient records with detailed medical data
 - **Risk Assessment**: AI-powered risk evaluation based on multiple factors
-- **Weather Integration**: Real-time weather data and heat wave detection
+- **Weather Integration**: Real-time weather data and heat wave detection (temporarily disabled for performance)
 - **Personalized Notifications**: AI-generated health advice in Russian
 - **REST API**: Complete RESTful API for all operations
 - **Database Support**: MySQL database
 - **Data Import**: Bulk import of patients from CSV files
+- **Performance Optimized**: Fast API responses with limited data sets
+- **Comprehensive Patient Data**: Detailed medical information including medications, NDC codes, and conditions
+
+## Recent Updates (v1.1.0)
+
+### ✅ **Fixed Issues:**
+- Fixed trimester calculation error in risk assessment
+- Resolved API hanging issues with weather data
+- Improved error handling and logging
+
+### 🚀 **New Features:**
+- Enhanced patient data with comprehensive medical information
+- Performance optimizations with 10-patient limit for fast responses
+- Added detailed medication information with NDC codes
+- Improved risk assessment with better scoring
+- Added age group classification and trimester calculation
 
 ## Patient Data Structure
 
@@ -72,8 +88,14 @@ The system evaluates risk based on:
 - `DELETE /api/patients/{id}` - Delete patient
 - `GET /api/patients` - Get all patients (paginated)
 
-### Risk Assessment
+### Risk Assessment (Performance Optimized)
+- `GET /api/risk-patients` - Get first 10 patients with risk assessment
+- `GET /api/risk-patients/{id}` - Get detailed risk assessment for specific patient
+- `GET /api/risk-patients/summary` - Get risk summary (first 10 patients)
+- `GET /api/risk-patients/{id}/comprehensive` - Get comprehensive risk assessment
 - `POST /api/assess-risk/{patient_id}` - Assess patient risk
+
+**Note**: Risk assessment endpoints are limited to 10 patients for optimal performance. Use individual patient endpoints for specific data.
 - `GET /api/risk/{patient_id}` - Get latest risk assessment
 - `GET /api/risk/{patient_id}/history` - Get risk assessment history
 

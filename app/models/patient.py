@@ -17,10 +17,10 @@ class Patient(db.Model):
     zip_code = db.Column(db.String(20), nullable=False)
     phone_number = db.Column(db.String(20))
     email = db.Column(db.String(100))
-    medications = db.Column(db.Text)  # Medications
-    medication_notes = db.Column(db.Text)  # Medication Notes
-    ndc_codes = db.Column(db.Text)  # NDC Codes
-    between_17_35 = db.Column(db.Boolean, default=False)  # Between 17-35 flag
+    medications = db.Column(db.Text)  # Medications list
+    medication_notes = db.Column(db.Text)  # Medication notes and descriptions
+    ndc_codes = db.Column(db.Text)  # NDC codes for medications
+    between_17_35 = db.Column(db.Boolean, default=False)  # Optimal age range flag (17-35 years)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -85,7 +85,7 @@ class Patient(db.Model):
         return []
     
     def is_high_risk_age(self):
-        """Check if patient is in high-risk age group (outside 17-35)"""
+        """Check if patient is in high-risk age group (outside 17-35 years)"""
         return not self.between_17_35
     
     def to_dict(self):

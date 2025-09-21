@@ -1,43 +1,43 @@
-# Система уведомлений о здоровье для беременных женщин
+# Health Notification System for Pregnant Women
 
-Комплексная система мониторинга здоровья беременных женщин с интеграцией климатических данных, оценки рисков и персонализированных уведомлений.
+A comprehensive health monitoring system for pregnant women with climate data integration, risk assessment, and personalized notifications.
 
-## Основные возможности
+## Key Features
 
-- **Управление пациентами**: Полные CRUD операции для записей пациентов с детальными медицинскими данными
-- **Оценка рисков**: ИИ-оценка рисков на основе множественных факторов
-- **Интеграция погоды**: Данные о погоде в реальном времени и обнаружение тепловых волн
-- **Персонализированные уведомления**: ИИ-генерируемые советы по здоровью на русском языке
-- **REST API**: Полный RESTful API для всех операций
-- **Поддержка базы данных**: MySQL база данных
-- **Импорт данных**: Массовый импорт пациентов из CSV файлов
+- **Patient Management**: Complete CRUD operations for patient records with detailed medical data
+- **Risk Assessment**: AI-powered risk evaluation based on multiple factors
+- **Weather Integration**: Real-time weather data and heat wave detection
+- **Personalized Notifications**: AI-generated health advice in Russian
+- **REST API**: Complete RESTful API for all operations
+- **Database Support**: MySQL database
+- **Data Import**: Bulk import of patients from CSV files
 
-## Структура данных пациентов
+## Patient Data Structure
 
-### Новые поля (обновленная модель)
+### New Fields (Updated Model)
 
-- **name** (string): Имя пациента
-- **age** (integer): Возраст (17-45 лет)
-- **pregnancy_icd10** (string): ICD-10 код беременности
-- **pregnancy_description** (string): Описание состояния беременности
-- **comorbidity_icd10** (string): ICD-10 код сопутствующих заболеваний
-- **comorbidity_description** (string): Описание сопутствующих заболеваний
-- **weeks_pregnant** (integer): Недели беременности (1-42)
-- **address** (string): Адрес пациента
-- **zip_code** (string): Почтовый индекс
-- **phone_number** (string): Номер телефона
-- **email** (string): Email адрес
+- **name** (string): Patient name
+- **age** (integer): Age (17-45 years)
+- **pregnancy_icd10** (string): ICD-10 pregnancy code
+- **pregnancy_description** (string): Pregnancy condition description
+- **comorbidity_icd10** (string): ICD-10 comorbidity code
+- **comorbidity_description** (string): Comorbidity description
+- **weeks_pregnant** (integer): Weeks of pregnancy (1-42)
+- **address** (string): Patient address
+- **zip_code** (string): ZIP code
+- **phone_number** (string): Phone number
+- **email** (string): Email address
 
-### Обратная совместимость
+### Backward Compatibility
 
-Система поддерживает старые поля для обратной совместимости:
-- **conditions_icd10** (array): Массив ICD-10 кодов
-- **trimester** (integer): Триместр беременности (1-3)
+The system supports old fields for backward compatibility:
+- **conditions_icd10** (array): Array of ICD-10 codes
+- **trimester** (integer): Pregnancy trimester (1-3)
 
-Триместр автоматически рассчитывается из `weeks_pregnant`:
-- 1-12 недель = 1 триместр
-- 13-24 недели = 2 триместр  
-- 25-42 недели = 3 триместр
+Trimester is automatically calculated from `weeks_pregnant`:
+- 1-12 weeks = 1st trimester
+- 13-24 weeks = 2nd trimester  
+- 25-42 weeks = 3rd trimester
 
 ## Risk Assessment Factors
 
@@ -86,71 +86,71 @@ The system evaluates risk based on:
 - `GET /api/health` - Health check
 - `GET /api/weather/{zip_code}` - Get weather data
 
-## Установка и запуск
+## Installation and Setup
 
-1. **Установите зависимости**:
+1. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Настройте переменные окружения**:
+2. **Configure environment variables**:
    ```bash
    cp env.example .env
-   # Отредактируйте .env с вашими настройками
+   # Edit .env with your settings
    ```
 
-3. **Создайте базу данных MySQL**:
+3. **Create MySQL database**:
    ```sql
    CREATE DATABASE health_notifier;
    ```
 
-4. **Запустите приложение**:
+4. **Run the application**:
    ```bash
    python main.py
    ```
 
-## Переменные окружения
+## Environment Variables
 
-Создайте файл `.env` со следующими переменными:
+Create a `.env` file with the following variables:
 
 ```env
-# Настройки базы данных
+# Database settings
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=health_notifier
 
-# Внешние API
+# External APIs
 GEMINI_API_KEY=your_gemini_api_key
 WEATHER_API_KEY=your_weather_key
 
-# Настройки приложения
+# Application settings
 FLASK_ENV=development
 SECRET_KEY=your_secret_key
 FLASK_DEBUG=True
 ```
 
-### Как получить API ключи:
+### How to get API keys:
 
 1. **Gemini API Key**:
-   - Перейдите на https://makersuite.google.com/app/apikey
-   - Создайте новый API ключ
-   - Скопируйте ключ в переменную `GEMINI_API_KEY`
+   - Go to https://makersuite.google.com/app/apikey
+   - Create a new API key
+   - Copy the key to `GEMINI_API_KEY` variable
 
 2. **Weather API Key**:
-   - Зарегистрируйтесь на https://openweathermap.org/api
-   - Получите бесплатный API ключ
-   - Скопируйте ключ в переменную `WEATHER_API_KEY`
+   - Register at https://openweathermap.org/api
+   - Get a free API key
+   - Copy the key to `WEATHER_API_KEY` variable
 
-## Примеры использования
+## Usage Examples
 
-### Создание пациента с новыми полями
+### Creating a patient with new fields
 
 ```bash
 curl -X POST http://localhost:5000/api/patients \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Анна Петрова",
+    "name": "Anna Petrova",
     "age": 28,
     "pregnancy_icd10": "O24.4",
     "pregnancy_description": "Gestational diabetes mellitus",
@@ -164,20 +164,20 @@ curl -X POST http://localhost:5000/api/patients \
   }'
 ```
 
-### Импорт данных из CSV
+### CSV data import
 
 ```bash
-# Импорт 1000 пациентов из CSV файла
+# Import 1000 patients from CSV file
 python import_patients.py
 
-# Или с указанием файла
+# Or specify a file
 python import_patients.py synthetic_pregnant_patients_1000.csv
 ```
 
-### Миграция существующей базы данных
+### Existing database migration
 
 ```bash
-# Обновление схемы для существующих баз данных
+# Update schema for existing databases
 python migrate_patient_schema.py
 ```
 
@@ -226,7 +226,7 @@ python migrate_patient_schema.py
 curl -X POST http://localhost:5000/api/patients \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Мария Иванова",
+    "name": "Maria Ivanova",
     "age": 28,
     "geo_location": "Moscow",
     "zip_code": "101000",
@@ -254,7 +254,7 @@ curl http://localhost:5000/api/notifications/1
 - Heat wave detection
 - Temperature and humidity monitoring
 
-### OpenAI API
+### Gemini API
 - Personalized health messages in Russian
 - Context-aware recommendations
 - Risk-specific advice generation
@@ -274,7 +274,7 @@ The system recognizes the following high-risk pregnancy-related ICD10 codes:
 ```bash
 export FLASK_ENV=development
 export FLASK_DEBUG=True
-python run.py
+python main.py
 ```
 
 ### Database Migrations

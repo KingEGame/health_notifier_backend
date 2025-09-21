@@ -1,187 +1,187 @@
-# 🚀 Health Notifier - Полное руководство по развертыванию
+# 🚀 Health Notifier - Complete Deployment Guide
 
-## 📋 Обзор развертывания
+## 📋 Deployment Overview
 
-Health Notifier System поддерживает множество способов развертывания - от локальной разработки до production на AWS. Выберите подходящий вариант для ваших нужд.
+Health Notifier System supports multiple deployment methods - from local development to production on AWS. Choose the option that suits your needs.
 
-## 🎯 Варианты развертывания
+## 🎯 Deployment Options
 
-### 1. 🏠 Локальная разработка
-**Время настройки**: 5 минут  
-**Сложность**: ⭐  
-**Стоимость**: Бесплатно
+### 1. 🏠 Local Development
+**Setup time**: 5 minutes  
+**Complexity**: ⭐  
+**Cost**: Free
 
 ```bash
-# Быстрый старт
+# Quick start
 git clone <repository>
 cd health_notifier
 pip install -r requirements.txt
 python main.py
 ```
 
-### 2. 🐳 Docker (Рекомендуется)
-**Время настройки**: 10 минут  
-**Сложность**: ⭐⭐  
-**Стоимость**: Бесплатно
+### 2. 🐳 Docker (Recommended)
+**Setup time**: 10 minutes  
+**Complexity**: ⭐⭐  
+**Cost**: Free
 
 ```bash
-# Быстрое развертывание
+# Quick deployment
 export GEMINI_API_KEY=your-key
 export WEATHER_API_KEY=your-key
 ./deployment/quick-deploy.sh
 ```
 
 ### 3. ☁️ AWS EC2
-**Время настройки**: 30 минут  
-**Сложность**: ⭐⭐⭐  
-**Стоимость**: ~$15-25/месяц
+**Setup time**: 30 minutes  
+**Complexity**: ⭐⭐⭐  
+**Cost**: ~$15-25/month
 
 ```bash
-# Создание инфраструктуры
+# Create infrastructure
 aws cloudformation create-stack \
     --stack-name health-notifier \
     --template-body file://deployment/cloudformation-template.yaml
 ```
 
 ### 4. 🏢 Production AWS
-**Время настройки**: 1 час  
-**Сложность**: ⭐⭐⭐⭐  
-**Стоимость**: ~$50-100/месяц
+**Setup time**: 1 hour  
+**Complexity**: ⭐⭐⭐⭐  
+**Cost**: ~$50-100/month
 
-## 🚀 Быстрый старт (5 минут)
+## 🚀 Quick Start (5 minutes)
 
-### Шаг 1: Клонирование
+### Step 1: Clone
 ```bash
 git clone https://github.com/yourusername/health-notifier.git
 cd health_notifier
 ```
 
-### Шаг 2: Установка зависимостей
+### Step 2: Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### Шаг 3: Настройка переменных
+### Step 3: Configure Variables
 ```bash
 cp env.example .env
-# Отредактируйте .env файл
+# Edit .env file
 ```
 
-### Шаг 4: Создание базы данных
+### Step 4: Create Database
 ```sql
 CREATE DATABASE health_notifier;
 ```
 
-### Шаг 5: Запуск
+### Step 5: Run
 ```bash
 python main.py
 ```
 
-## 🐳 Docker развертывание
+## 🐳 Docker Deployment
 
-### Простое развертывание
+### Simple Deployment
 ```bash
-# Установите переменные окружения
+# Set environment variables
 export GEMINI_API_KEY=your-gemini-key
 export WEATHER_API_KEY=your-weather-key
 
-# Запустите быстрое развертывание
+# Run quick deployment
 ./deployment/quick-deploy.sh
 ```
 
-### Ручное развертывание
+### Manual Deployment
 ```bash
-# Сборка и запуск
+# Build and run
 docker-compose up -d
 
-# Проверка статуса
+# Check status
 docker-compose ps
 
-# Просмотр логов
+# View logs
 docker-compose logs -f
 ```
 
-## ☁️ AWS развертывание
+## ☁️ AWS Deployment
 
-### 1. CloudFormation (Автоматическое)
+### 1. CloudFormation (Automatic)
 ```bash
-# Создание стека
+# Create stack
 aws cloudformation create-stack \
     --stack-name health-notifier \
     --template-body file://deployment/cloudformation-template.yaml \
     --parameters ParameterKey=DBPassword,ParameterValue=YourPassword123
 
-# Ожидание завершения
+# Wait for completion
 aws cloudformation wait stack-create-complete \
     --stack-name health-notifier
 ```
 
-### 2. Ручное развертывание на EC2
+### 2. Manual EC2 Deployment
 ```bash
-# 1. Создайте EC2 instance (Amazon Linux 2)
-# 2. Скопируйте скрипт настройки
+# 1. Create EC2 instance (Amazon Linux 2)
+# 2. Copy setup script
 scp -i your-key.pem deployment/setup-ec2.sh ec2-user@your-ec2-ip:~/
 
-# 3. Запустите настройку
+# 3. Run setup
 ssh -i your-key.pem ec2-user@your-ec2-ip
 sudo ./setup-ec2.sh
 
-# 4. Настройте .env файл
+# 4. Configure .env file
 sudo nano /home/appuser/health-notifier/.env
 
-# 5. Запустите приложение
+# 5. Start application
 sudo systemctl start health-notifier
 ```
 
-### 3. Автоматическое развертывание
+### 3. Automatic Deployment
 ```bash
-# Настройте переменные
+# Set variables
 export INSTANCE_IP=your-ec2-ip
 export KEY_PATH=~/.ssh/your-key.pem
 
-# Запустите развертывание
+# Run deployment
 ./deployment/deploy.sh
 ```
 
-## 🔧 Конфигурация
+## 🔧 Configuration
 
-### Обязательные переменные окружения
+### Required Environment Variables
 
 ```env
-# API ключи
+# API keys
 GEMINI_API_KEY=your-gemini-api-key
 WEATHER_API_KEY=your-weather-api-key
 
-# База данных
+# Database
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=your-password
 DB_NAME=health_notifier
 
-# Настройки приложения
+# Application settings
 FLASK_ENV=production
 SECRET_KEY=your-secret-key
 ```
 
-### Получение API ключей
+### Getting API Keys
 
 1. **Gemini API**:
    - https://makersuite.google.com/app/apikey
-   - Создайте API ключ
-   - Скопируйте в `GEMINI_API_KEY`
+   - Create API key
+   - Copy to `GEMINI_API_KEY`
 
 2. **Weather API**:
    - https://openweathermap.org/api
-   - Зарегистрируйтесь (бесплатно)
-   - Скопируйте в `WEATHER_API_KEY`
+   - Register (free)
+   - Copy to `WEATHER_API_KEY`
 
-## 📊 Мониторинг и логи
+## 📊 Monitoring and Logs
 
 ### Health Checks
 - **Basic**: `GET /api/health`
 - **Detailed**: `GET /api/health/detailed`
 
-### Логирование
+### Logging
 ```bash
 # Docker
 docker-compose logs -f
@@ -193,23 +193,23 @@ sudo journalctl -u health-notifier -f
 sudo tail -f /var/log/nginx/access.log
 ```
 
-## 💾 Резервное копирование
+## 💾 Backup
 
-### Автоматические бэкапы
+### Automatic Backups
 ```bash
-# Настройка переменных
+# Set variables
 export DB_HOST=your-db-host
 export DB_PASS=your-password
 export S3_BUCKET=your-backup-bucket
 
-# Запуск бэкапа
+# Run backup
 ./deployment/backup-db.sh
 
-# Настройка cron
+# Setup cron
 echo "0 2 * * * /path/to/backup-db.sh" | crontab -
 ```
 
-## 🔒 Безопасность
+## 🔒 Security
 
 ### SSL/HTTPS
 ```bash
@@ -226,86 +226,86 @@ sudo ufw allow 443
 sudo ufw enable
 ```
 
-## 📈 Масштабирование
+## 📈 Scaling
 
-### Горизонтальное
+### Horizontal
 - Load Balancer
 - Auto Scaling Group
 - Multiple EC2 instances
 
-### Вертикальное
-- Увеличение instance types
-- Увеличение RDS instance class
-- Увеличение storage
+### Vertical
+- Increase instance types
+- Increase RDS instance class
+- Increase storage
 
-## 💰 Стоимость
+## 💰 Cost
 
-### Минимальная конфигурация
+### Minimal Configuration
 - **EC2**: t2.micro (Free Tier)
 - **RDS**: db.t3.micro (20GB)
 - **Storage**: 20GB
-- **Estimated**: $15-25/месяц
+- **Estimated**: $15-25/month
 
-### Production конфигурация
+### Production Configuration
 - **EC2**: t3.small
 - **RDS**: db.t3.small
 - **Load Balancer**: ALB
-- **Estimated**: $50-100/месяц
+- **Estimated**: $50-100/month
 
-## 🛠️ Устранение неполадок
+## 🛠️ Troubleshooting
 
-### Общие проблемы
+### Common Issues
 
-1. **Приложение не запускается**:
+1. **Application won't start**:
    ```bash
-   # Проверьте логи
+   # Check logs
    docker-compose logs app
    sudo journalctl -u health-notifier
    ```
 
-2. **База данных недоступна**:
+2. **Database unavailable**:
    ```bash
-   # Проверьте подключение
+   # Check connection
    mysql -h your-db-host -u username -p
    ```
 
-3. **API ключи не работают**:
+3. **API keys not working**:
    ```bash
-   # Проверьте переменные
+   # Check variables
    env | grep API_KEY
    ```
 
-### Полезные команды
+### Useful Commands
 
 ```bash
-# Перезапуск сервисов
+# Restart services
 sudo systemctl restart health-notifier
 docker-compose restart
 
-# Проверка статуса
+# Check status
 sudo systemctl status health-notifier
 docker-compose ps
 
-# Тестирование API
+# Test API
 curl http://localhost:5000/api/health
 ```
 
-## 📚 Дополнительные ресурсы
+## 📚 Additional Resources
 
-- [Архитектура системы](ARCHITECTURE.md)
-- [Быстрый старт](QUICK_START.md)
-- [AWS руководство](deployment/aws-deployment-guide.md)
-- [Docker руководство](deployment/README.md)
+- [System Architecture](ARCHITECTURE.md)
+- [Quick Start](QUICK_START.md)
+- [AWS Guide](deployment/aws-deployment-guide.md)
+- [Docker Guide](deployment/README.md)
 
-## 🆘 Поддержка
+## 🆘 Support
 
-Если у вас возникли проблемы:
+If you encounter issues:
 
-1. Проверьте логи приложения
-2. Убедитесь, что все переменные настроены
-3. Проверьте подключение к базе данных
-4. Создайте issue в репозитории
+1. Check application logs
+2. Ensure all variables are configured
+3. Check database connection
+4. Create an issue in the repository
 
 ---
 
-**Выберите подходящий вариант развертывания и следуйте инструкциям!** 🚀
+**Choose the appropriate deployment option and follow the instructions!** 🚀

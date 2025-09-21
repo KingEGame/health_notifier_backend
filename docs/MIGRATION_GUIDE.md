@@ -1,48 +1,48 @@
-# 🔄 Руководство по миграции - Обновление полей пациентов
+# 🔄 Migration Guide - Patient Fields Update
 
-## Обзор изменений
+## Changes Overview
 
-Модель `Patient` была обновлена для поддержки более детальных медицинских данных в соответствии с CSV файлом `synthetic_pregnant_patients_1000.csv`.
+The `Patient` model has been updated to support more detailed medical data in accordance with the `synthetic_pregnant_patients_1000.csv` file.
 
-### Новые поля
+### New Fields
 
-| Поле | Тип | Описание |
+| Field | Type | Description |
 |------|-----|----------|
-| `pregnancy_icd10` | VARCHAR(20) | ICD-10 код беременности |
-| `pregnancy_description` | TEXT | Описание состояния беременности |
-| `comorbidity_icd10` | VARCHAR(20) | ICD-10 код сопутствующих заболеваний |
-| `comorbidity_description` | TEXT | Описание сопутствующих заболеваний |
-| `weeks_pregnant` | INT | Недели беременности (1-42) |
-| `address` | TEXT | Адрес пациента |
+| `pregnancy_icd10` | VARCHAR(20) | ICD-10 pregnancy code |
+| `pregnancy_description` | TEXT | Pregnancy condition description |
+| `comorbidity_icd10` | VARCHAR(20) | ICD-10 comorbidity code |
+| `comorbidity_description` | TEXT | Comorbidity description |
+| `weeks_pregnant` | INT | Weeks of pregnancy (1-42) |
+| `address` | TEXT | Patient address |
 
-### Удаленные поля
+### Removed Fields
 
-| Поле | Замена |
+| Field | Replacement |
 |------|--------|
 | `geo_location` | `address` |
 | `conditions_icd10` | `pregnancy_icd10` + `comorbidity_icd10` |
-| `trimester` | Автоматически рассчитывается из `weeks_pregnant` |
+| `trimester` | Automatically calculated from `weeks_pregnant` |
 
-## Миграция существующих данных
+## Existing Data Migration
 
-### 1. Автоматическая миграция схемы
+### 1. Automatic Schema Migration
 
 ```bash
-# Запустите скрипт миграции
+# Run migration script
 python migrate_patient_schema.py
 ```
 
-Этот скрипт:
-- Добавит новые колонки в таблицу `patients`
-- Создаст необходимые индексы
-- Сохранит существующие данные
+This script will:
+- Add new columns to the `patients` table
+- Create necessary indexes
+- Preserve existing data
 
-### 2. Ручная миграция данных
+### 2. Manual Data Migration
 
-Если у вас есть существующие данные, которые нужно перенести:
+If you have existing data that needs to be migrated:
 
 ```python
-# Пример скрипта для переноса данных
+# Example script for data migration
 from app import create_app, db
 from app.models.patient import Patient
 
@@ -51,49 +51,49 @@ with app.app_context():
     patients = Patient.query.all()
     
     for patient in patients:
-        # Переносим geo_location в address
+        # Migrate geo_location to address
         if hasattr(patient, 'geo_location') and patient.geo_location:
             patient.address = patient.geo_location
         
-        # Переносим conditions_icd10
+        # Migrate conditions_icd10
         if hasattr(patient, 'conditions_icd10') and patient.conditions_icd10:
             conditions = patient.get_conditions()
             if conditions:
                 patient.pregnancy_icd10 = conditions[0] if len(conditions) > 0 else None
                 patient.comorbidity_icd10 = conditions[1] if len(conditions) > 1 else None
         
-        # Рассчитываем weeks_pregnant из trimester
+        # Calculate weeks_pregnant from trimester
         if hasattr(patient, 'trimester') and patient.trimester:
             if patient.trimester == 1:
-                patient.weeks_pregnant = 8  # Среднее значение для 1 триместра
+                patient.weeks_pregnant = 8  # Average value for 1st trimester
             elif patient.trimester == 2:
-                patient.weeks_pregnant = 18  # Среднее значение для 2 триместра
+                patient.weeks_pregnant = 18  # Average value for 2nd trimester
             elif patient.trimester == 3:
-                patient.weeks_pregnant = 32  # Среднее значение для 3 триместра
+                patient.weeks_pregnant = 32  # Average value for 3rd trimester
     
     db.session.commit()
 ```
 
-## Импорт новых данных
+## New Data Import
 
-### 1. Импорт из CSV файла
+### 1. CSV File Import
 
 ```bash
-# Импорт 1000 пациентов из CSV
+# Import 1000 patients from CSV
 python import_patients.py
 
-# Или с указанием файла
+# Or specify a file
 python import_patients.py synthetic_pregnant_patients_1000.csv
 ```
 
-### 2. Создание новых пациентов через API
+### 2. Creating New Patients via API
 
 ```bash
-# Новый формат
+# New format
 curl -X POST http://localhost:5000/api/patients \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Анна Петрова",
+    "name": "Anna Petrova",
     "age": 28,
     "pregnancy_icd10": "O24.4",
     "pregnancy_description": "Gestational diabetes mellitus",
@@ -105,23 +105,23 @@ curl -X POST http://localhost:5000/api/patients \
   }'
 ```
 
-## Обратная совместимость
+## Backward Compatibility
 
-Система поддерживает старые поля для обратной совместимости:
+The system supports old fields for backward compatibility:
 
 ### API Endpoints
 
-- `conditions_icd10` - автоматически преобразуется в `pregnancy_icd10` + `comorbidity_icd10`
-- `trimester` - автоматически рассчитывается из `weeks_pregnant`
+- `conditions_icd10` - automatically converted to `pregnancy_icd10` + `comorbidity_icd10`
+- `trimester` - automatically calculated from `weeks_pregnant`
 
-### Примеры
+### Examples
 
 ```bash
-# Старый формат (все еще работает)
+# Old format (still works)
 curl -X POST http://localhost:5000/api/patients \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Елена Смирнова",
+    "name": "Elena Smirnova",
     "age": 32,
     "zip_code": "190000",
     "conditions_icd10": ["O13", "I10"],
@@ -129,28 +129,28 @@ curl -X POST http://localhost:5000/api/patients \
   }'
 ```
 
-## Тестирование
+## Testing
 
-### 1. Тест новых полей
+### 1. Test New Fields
 
 ```bash
 python test_new_patient_fields.py
 ```
 
-### 2. Тест обратной совместимости
+### 2. Test Backward Compatibility
 
 ```bash
 python test_simple.py
 ```
 
-## Обновление кода
+## Code Updates
 
-### 1. Модель Patient
+### 1. Patient Model
 
 ```python
-# Новые методы
-patient.get_trimester()  # Рассчитывает триместр из weeks_pregnant
-patient.get_conditions()  # Возвращает массив всех ICD-10 кодов
+# New methods
+patient.get_trimester()  # Calculates trimester from weeks_pregnant
+patient.get_conditions()  # Returns array of all ICD-10 codes
 ```
 
 ### 2. API Responses
@@ -158,7 +158,7 @@ patient.get_conditions()  # Возвращает массив всех ICD-10 к
 ```json
 {
   "id": 1,
-  "name": "Анна Петрова",
+  "name": "Anna Petrova",
   "age": 28,
   "pregnancy_icd10": "O24.4",
   "pregnancy_description": "Gestational diabetes mellitus",
@@ -167,20 +167,20 @@ patient.get_conditions()  # Возвращает массив всех ICD-10 к
   "weeks_pregnant": 20,
   "address": "123 Main St, Moscow",
   "zip_code": "101000",
-  "trimester": 2,  // Автоматически рассчитывается
-  "conditions_icd10": ["O24.4", "I10"]  // Для обратной совместимости
+  "trimester": 2,  // Automatically calculated
+  "conditions_icd10": ["O24.4", "I10"]  // For backward compatibility
 }
 ```
 
-## Проверка миграции
+## Migration Verification
 
-### 1. Проверка схемы базы данных
+### 1. Database Schema Check
 
 ```sql
 DESCRIBE patients;
 ```
 
-### 2. Проверка данных
+### 2. Data Check
 
 ```python
 from app import create_app, db
@@ -197,12 +197,12 @@ with app.app_context():
         print()
 ```
 
-## Откат изменений
+## Rollback Changes
 
-Если нужно откатить изменения:
+If you need to rollback changes:
 
 ```sql
--- Удалить новые колонки
+-- Remove new columns
 ALTER TABLE patients DROP COLUMN pregnancy_icd10;
 ALTER TABLE patients DROP COLUMN pregnancy_description;
 ALTER TABLE patients DROP COLUMN comorbidity_icd10;
@@ -210,21 +210,21 @@ ALTER TABLE patients DROP COLUMN comorbidity_description;
 ALTER TABLE patients DROP COLUMN weeks_pregnant;
 ALTER TABLE patients DROP COLUMN address;
 
--- Восстановить старые колонки
+-- Restore old columns
 ALTER TABLE patients ADD COLUMN geo_location VARCHAR(100);
 ALTER TABLE patients ADD COLUMN conditions_icd10 TEXT;
 ALTER TABLE patients ADD COLUMN trimester INT;
 ```
 
-## Поддержка
+## Support
 
-Если у вас возникли проблемы с миграцией:
+If you encounter migration issues:
 
-1. Проверьте логи приложения
-2. Убедитесь, что база данных доступна
-3. Проверьте права доступа к базе данных
-4. Создайте issue в репозитории проекта
+1. Check application logs
+2. Ensure database is accessible
+3. Check database access permissions
+4. Create an issue in the project repository
 
 ---
 
-**Важно**: Сделайте резервную копию базы данных перед миграцией!
+**Important**: Make a database backup before migration!

@@ -1,88 +1,88 @@
-# 🚨 Система экстренных уведомлений с тремя уровнями риска
+# 🚨 Emergency Notification System with Three Risk Levels
 
-## 📋 Обзор
+## 📋 Overview
 
-Система Health Notifier теперь поддерживает три уровня риска с автоматическими действиями:
+The Health Notifier system now supports three risk levels with automatic actions:
 
-- **🟢 Низкий риск (Low Risk)**: Стандартные уведомления пациенту
-- **🟡 Средний риск (Medium Risk)**: Расширенные уведомления с рекомендациями
-- **🔴 Высокий риск (High Risk)**: Автоматический звонок врачу + экстренные уведомления
+- **🟢 Low Risk**: Standard patient notifications
+- **🟡 Medium Risk**: Enhanced notifications with recommendations
+- **🔴 High Risk**: Automatic doctor call + emergency notifications
 
-## 🎯 Три уровня риска
+## 🎯 Three Risk Levels
 
-### 🟢 Низкий риск (Low Risk)
-**Критерии:**
-- Возраст: 21-30 лет
-- Триместр: 2-й триместр
-- Медицинские состояния: Отсутствуют или низкий риск
+### 🟢 Low Risk
+**Criteria:**
+- Age: 21-30 years
+- Trimester: 2nd trimester
+- Medical conditions: None or low risk
 
-**Действия:**
-- Стандартное уведомление пациенту
-- Общие рекомендации по здоровью
-- Мониторинг состояния
+**Actions:**
+- Standard patient notification
+- General health recommendations
+- Condition monitoring
 
-### 🟡 Средний риск (Medium Risk)
-**Критерии:**
-- Возраст: 25-30 лет ИЛИ 1-й триместр
-- Медицинские состояния: Одно состояние среднего риска
+### 🟡 Medium Risk
+**Criteria:**
+- Age: 25-30 years OR 1st trimester
+- Medical conditions: One medium-risk condition
 
-**Действия:**
-- Расширенное уведомление пациенту
-- Рекомендации по обращению в клинику
-- Усиленный мониторинг
+**Actions:**
+- Enhanced patient notification
+- Clinic visit recommendations
+- Enhanced monitoring
 
-### 🔴 Высокий риск (High Risk)
-**Критерии:**
-- Возраст: ≤20 лет ИЛИ ≥35 лет
-- Триместр: 3-й триместр
-- Медицинские состояния: Высокий риск (O24, O13, O14, O10, O99.4)
+### 🔴 High Risk
+**Criteria:**
+- Age: ≤20 years OR ≥35 years
+- Trimester: 3rd trimester
+- Medical conditions: High risk (O24, O13, O14, O10, O99.4)
 
-**Действия:**
-- **Автоматический звонок врачу** 🚨
-- Экстренное уведомление в ближайшую больницу
-- Уведомление пациенту о необходимости срочной консультации
-- Приоритетное обслуживание
+**Actions:**
+- **Automatic doctor call** 🚨
+- Emergency notification to nearest hospital
+- Patient notification about urgent consultation need
+- Priority service
 
-## 🏥 Интеграция с медицинскими учреждениями
+## 🏥 Medical Facility Integration
 
-### Типы учреждений
-- **HOSP**: Больницы
-- **NH**: Дома престарелых
-- **DTC**: Диагностические центры
-- **HOSP-EC**: Клиники при больницах
+### Facility Types
+- **HOSP**: Hospitals
+- **NH**: Nursing homes
+- **DTC**: Diagnostic centers
+- **HOSP-EC**: Hospital clinics
 
-### Автоматический поиск
-- **Высокий риск**: Поиск ближайшей больницы
-- **Средний риск**: Поиск ближайшей клиники
-- **Низкий риск**: Стандартные рекомендации
+### Automatic Search
+- **High risk**: Search for nearest hospital
+- **Medium risk**: Search for nearest clinic
+- **Low risk**: Standard recommendations
 
 ## 🌐 API Endpoints
 
-### Управление медицинскими учреждениями
-- `GET /api/health-facilities` - Получить все учреждения
-- `GET /api/health-facilities/{id}` - Получить учреждение по ID
-- `GET /api/health-facilities/search?q=term` - Поиск учреждений
-- `GET /api/health-facilities/nearest?zip_code=12345` - Ближайшие учреждения
-- `GET /api/health-facilities/types` - Типы учреждений
+### Medical Facility Management
+- `GET /api/health-facilities` - Get all facilities
+- `GET /api/health-facilities/{id}` - Get facility by ID
+- `GET /api/health-facilities/search?q=term` - Search facilities
+- `GET /api/health-facilities/nearest?zip_code=12345` - Nearest facilities
+- `GET /api/health-facilities/types` - Facility types
 
-### Экстренные уведомления
-- `POST /api/emergency-notifications` - Создать экстренное уведомление
-- `GET /api/emergency-notifications` - Получить уведомления
-- `GET /api/emergency-notifications/{id}` - Получить уведомление по ID
-- `PUT /api/emergency-notifications/{id}/update` - Обновить статус
-- `POST /api/emergency-notifications/patient/{id}/assess` - Оценить риск пациента
-- `GET /api/emergency-notifications/stats` - Статистика уведомлений
-- `GET /api/emergency-notifications/pending` - Ожидающие уведомления
+### Emergency Notifications
+- `POST /api/emergency-notifications` - Create emergency notification
+- `GET /api/emergency-notifications` - Get notifications
+- `GET /api/emergency-notifications/{id}` - Get notification by ID
+- `PUT /api/emergency-notifications/{id}/update` - Update status
+- `POST /api/emergency-notifications/patient/{id}/assess` - Assess patient risk
+- `GET /api/emergency-notifications/stats` - Notification statistics
+- `GET /api/emergency-notifications/pending` - Pending notifications
 
-## 📊 Примеры использования
+## 📊 Usage Examples
 
-### 1. Создание пациента с высоким риском
+### 1. Creating a High-Risk Patient
 
 ```bash
 curl -X POST http://localhost:5000/api/patients \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Высокий Риск Пациентка",
+    "name": "High Risk Patient",
     "age": 18,
     "pregnancy_icd10": "O24.4",
     "pregnancy_description": "Gestational diabetes mellitus",
@@ -96,13 +96,13 @@ curl -X POST http://localhost:5000/api/patients \
   }'
 ```
 
-### 2. Оценка риска и создание уведомлений
+### 2. Risk Assessment and Notification Creation
 
 ```bash
 curl -X POST http://localhost:5000/api/emergency-notifications/patient/1/assess
 ```
 
-**Ответ для высокого риска:**
+**Response for High Risk:**
 ```json
 {
   "success": true,
@@ -117,17 +117,17 @@ curl -X POST http://localhost:5000/api/emergency-notifications/patient/1/assess
     "facility_state": "New York"
   },
   "emergency_notification_id": 1,
-  "patient_message": "🚨 ВНИМАНИЕ! У вас высокий риск..."
+  "patient_message": "🚨 ATTENTION! You have high risk..."
 }
 ```
 
-### 3. Получение статистики уведомлений
+### 3. Getting Notification Statistics
 
 ```bash
 curl http://localhost:5000/api/emergency-notifications/stats
 ```
 
-**Ответ:**
+**Response:**
 ```json
 {
   "success": true,
@@ -154,126 +154,126 @@ curl http://localhost:5000/api/emergency-notifications/stats
 }
 ```
 
-## 🔧 Настройка и развертывание
+## 🔧 Setup and Deployment
 
-### 1. Импорт медицинских учреждений
+### 1. Import Medical Facilities
 
 ```bash
-# Импорт учреждений из CSV
+# Import facilities from CSV
 python import_health_facilities.py
 
-# Или с указанием файла
+# Or specify a file
 python import_health_facilities.py Health_Facility_General_Information_20250920.csv
 ```
 
-### 2. Импорт пациентов
+### 2. Import Patients
 
 ```bash
-# Импорт пациентов из CSV
+# Import patients from CSV
 python import_patients.py
 ```
 
-### 3. Тестирование системы
+### 3. System Testing
 
 ```bash
-# Тест экстренных уведомлений
+# Test emergency notifications
 python test_emergency_notifications.py
 
-# Тест новых полей пациентов
+# Test new patient fields
 python test_new_patient_fields.py
 ```
 
-## 📈 Мониторинг и статистика
+## 📈 Monitoring and Statistics
 
-### Ключевые метрики
-- **Количество уведомлений по уровням риска**
-- **Статус доставки уведомлений**
-- **Время отклика медицинских учреждений**
-- **Эффективность системы раннего предупреждения**
+### Key Metrics
+- **Number of notifications by risk level**
+- **Notification delivery status**
+- **Medical facility response time**
+- **Early warning system effectiveness**
 
-### Дашборд
-- Общее количество пациентов по уровням риска
-- Активные экстренные уведомления
-- Статистика по медицинским учреждениям
-- Тренды и аналитика
+### Dashboard
+- Total patients by risk level
+- Active emergency notifications
+- Medical facility statistics
+- Trends and analytics
 
-## 🚨 Процесс экстренного уведомления
+## 🚨 Emergency Notification Process
 
-### Высокий риск - Автоматический звонок врачу
+### High Risk - Automatic Doctor Call
 
-1. **Обнаружение высокого риска**
-   - Система анализирует данные пациента
-   - Определяет высокий уровень риска
-   - Инициирует экстренное уведомление
+1. **High Risk Detection**
+   - System analyzes patient data
+   - Determines high risk level
+   - Initiates emergency notification
 
-2. **Поиск ближайшей больницы**
-   - Поиск по ZIP коду пациента
-   - Фильтрация по типу учреждения (HOSP)
-   - Выбор учреждения с рабочим телефоном
+2. **Find Nearest Hospital**
+   - Search by patient ZIP code
+   - Filter by facility type (HOSP)
+   - Select facility with working phone
 
-3. **Создание экстренного уведомления**
-   - Генерация детального сообщения
-   - Установка приоритета "critical"
-   - Связывание с пациентом и больницей
+3. **Create Emergency Notification**
+   - Generate detailed message
+   - Set priority to "critical"
+   - Link with patient and hospital
 
-4. **Отправка уведомления**
-   - Звонок в больницу
-   - SMS/Email уведомление
-   - Логирование всех действий
+4. **Send Notification**
+   - Call hospital
+   - SMS/Email notification
+   - Log all actions
 
-5. **Отслеживание статуса**
-   - Отметка о доставке
-   - Получение ответа от больницы
-   - Обновление статуса пациента
+5. **Track Status**
+   - Mark delivery
+   - Get response from hospital
+   - Update patient status
 
-## 🔒 Безопасность и конфиденциальность
+## 🔒 Security and Privacy
 
-### Защита данных
-- Шифрование персональных данных
-- Безопасная передача уведомлений
-- Логирование всех действий
-- Соответствие HIPAA (при необходимости)
+### Data Protection
+- Personal data encryption
+- Secure notification transmission
+- Action logging
+- HIPAA compliance (if needed)
 
-### Контроль доступа
-- Роли пользователей
-- Права доступа к уведомлениям
-- Аудит действий
-- Резервное копирование
+### Access Control
+- User roles
+- Notification access rights
+- Action auditing
+- Backup
 
-## 📞 Интеграции
+## 📞 Integrations
 
-### Внешние сервисы
-- **SMS Gateway**: Отправка SMS уведомлений
-- **Email Service**: Email уведомления
-- **Voice API**: Автоматические звонки
-- **Hospital Systems**: Интеграция с системами больниц
+### External Services
+- **SMS Gateway**: SMS notifications
+- **Email Service**: Email notifications
+- **Voice API**: Automatic calls
+- **Hospital Systems**: Hospital system integration
 
-### API интеграции
-- **Emergency Services**: Службы экстренной помощи
-- **Weather API**: Погодные данные
-- **Geolocation API**: Определение местоположения
-- **Notification Services**: Сервисы уведомлений
+### API Integrations
+- **Emergency Services**: Emergency services
+- **Weather API**: Weather data
+- **Geolocation API**: Location detection
+- **Notification Services**: Notification services
 
-## 🎯 Преимущества системы
+## 🎯 System Benefits
 
-### Для пациентов
-- **Раннее предупреждение** о рисках
-- **Персонализированные рекомендации**
-- **Быстрая помощь** при высоком риске
-- **Непрерывный мониторинг**
+### For Patients
+- **Early warning** about risks
+- **Personalized recommendations**
+- **Quick help** for high risk
+- **Continuous monitoring**
 
-### Для медицинских учреждений
-- **Автоматические уведомления** о критических случаях
-- **Детальная информация** о пациентах
-- **Приоритизация** обращений
-- **Интеграция** с существующими системами
+### For Medical Facilities
+- **Automatic notifications** about critical cases
+- **Detailed information** about patients
+- **Prioritization** of requests
+- **Integration** with existing systems
 
-### Для системы здравоохранения
-- **Снижение** количества осложнений
-- **Улучшение** качества медицинской помощи
-- **Оптимизация** ресурсов
-- **Аналитика** и отчетность
+### For Healthcare System
+- **Reduction** in complications
+- **Improvement** in medical care quality
+- **Resource optimization**
+- **Analytics** and reporting
 
 ---
 
-**🚨 Система готова к использованию! Начните с импорта данных и тестирования API endpoints.**
+**🚨 System ready for use! Start with data import and API endpoint testing.**

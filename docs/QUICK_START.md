@@ -1,109 +1,109 @@
-# 🚀 Быстрый старт
+# 🚀 Quick Start
 
-## 1. Установка зависимостей
+## 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-## 2. Настройка переменных окружения
+## 2. Configure Environment Variables
 ```bash
-# Скопируйте файл с примером
+# Copy the example file
 cp env.example .env
 
-# Отредактируйте .env файл и добавьте ваши API ключи:
+# Edit .env file and add your API keys:
 ```
 
-### В файле .env укажите:
+### In the .env file specify:
 ```env
-# База данных
+# Database
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=health_notifier
 
-# API ключи
+# API keys
 GEMINI_API_KEY=your_gemini_api_key_here
 WEATHER_API_KEY=your_weather_api_key_here
 
-# Настройки
+# Settings
 FLASK_ENV=development
 SECRET_KEY=your_secret_key
 FLASK_DEBUG=True
 ```
 
-## 3. Получение API ключей
+## 3. Getting API Keys
 
 ### Gemini API Key (Google AI Studio):
-1. Перейдите на https://makersuite.google.com/app/apikey
-2. Войдите в Google аккаунт
-3. Нажмите "Create API Key"
-4. Скопируйте ключ в .env файл
+1. Go to https://makersuite.google.com/app/apikey
+2. Sign in to Google account
+3. Click "Create API Key"
+4. Copy the key to .env file
 
 ### Weather API Key (OpenWeatherMap):
-1. Перейдите на https://openweathermap.org/api
-2. Зарегистрируйтесь (бесплатно)
-3. Перейдите в "My API Keys"
-4. Скопируйте ключ в .env файл
+1. Go to https://openweathermap.org/api
+2. Register (free)
+3. Go to "My API Keys"
+4. Copy the key to .env file
 
-## 4. Создание базы данных
+## 4. Create Database
 ```sql
 CREATE DATABASE health_notifier;
 ```
 
-## 5. Запуск приложения
+## 5. Run Application
 ```bash
 python main.py
 ```
 
-## 6. Тестирование
+## 6. Testing
 ```bash
-# Установите dev зависимости
+# Install dev dependencies
 pip install -r requirements-dev.txt
 
-# Запустите тесты
+# Run tests
 pytest
 
-# Или простой тест
+# Or simple test
 python test_simple.py
 ```
 
-## 7. Проверка работы
-Откройте браузер: http://localhost:5000/api/health
+## 7. Check Operation
+Open browser: http://localhost:5000/api/health
 
 ---
 
-## 📋 Основные API endpoints:
+## 📋 Main API Endpoints:
 
-- `POST /api/patients` - Создать пациента
-- `GET /api/patients/{id}` - Получить пациента  
-- `POST /api/assess-risk/{id}` - Оценить риск
-- `GET /api/notifications/{id}` - Получить уведомления
-- `GET /api/health` - Проверка системы
+- `POST /api/patients` - Create patient
+- `GET /api/patients/{id}` - Get patient  
+- `POST /api/assess-risk/{id}` - Assess risk
+- `GET /api/notifications/{id}` - Get notifications
+- `GET /api/health` - System check
 
-## 🔧 Структура проекта:
+## 🔧 Project Structure:
 ```
 health_notifier/
-├── main.py              # 🚀 Запуск приложения
+├── main.py              # 🚀 Application startup
 ├── wsgi.py              # 🌐 Production WSGI
-├── config.py            # ⚙️ Конфигурация
-├── requirements.txt     # 📦 Зависимости
-├── requirements-dev.txt # 🛠️ Dev зависимости
-├── env.example          # 🔑 Пример переменных
-├── test_simple.py       # 🧪 Простые тесты
+├── config.py            # ⚙️ Configuration
+├── requirements.txt     # 📦 Dependencies
+├── requirements-dev.txt # 🛠️ Dev dependencies
+├── env.example          # 🔑 Environment variables example
+├── test_simple.py       # 🧪 Simple tests
 ├── app/
 │   ├── __init__.py      # 🏭 Application Factory
-│   ├── extensions.py    # 🔌 Расширения Flask
-│   ├── models/          # 🗄️ Модели базы данных
+│   ├── extensions.py    # 🔌 Flask extensions
+│   ├── models/          # 🗄️ Database models
 │   ├── api/             # 🌐 API endpoints
-│   ├── services/        # 🤖 Бизнес-логика
-│   ├── schemas/         # ✅ Валидация данных
-│   ├── utils/           # 🛠️ Утилиты
-│   └── errors/          # ❌ Обработка ошибок
-├── tests/               # 🧪 Тесты
-└── README.md            # 📖 Документация
+│   ├── services/        # 🤖 Business logic
+│   ├── schemas/         # ✅ Data validation
+│   ├── utils/           # 🛠️ Utilities
+│   └── errors/          # ❌ Error handling
+├── tests/               # 🧪 Tests
+└── README.md            # 📖 Documentation
 ```
 
-## ❗ Важно:
-- Убедитесь, что MySQL запущен
-- Проверьте правильность API ключей
-- При первом запуске создадутся таблицы автоматически
+## ❗ Important:
+- Make sure MySQL is running
+- Check API keys are correct
+- Tables will be created automatically on first run

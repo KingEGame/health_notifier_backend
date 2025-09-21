@@ -56,8 +56,9 @@ def get_risk_patients():
                 if patient_risk_level in ['medium', 'high']:
                     patients_at_risk += 1
                 
-                # Prepare patient data
+                # Prepare comprehensive patient data
                 patient_info = {
+                    # Basic patient information
                     'patient_id': patient.id,
                     'name': patient.name,
                     'age': patient.age,
@@ -65,18 +66,37 @@ def get_risk_patients():
                     'phone_number': patient.phone_number,
                     'email': patient.email,
                     'address': patient.address,
+                    
+                    # Pregnancy information
                     'pregnancy_weeks': patient.weeks_pregnant,
+                    'trimester': patient._calculate_trimester(),
                     'pregnancy_icd10': patient.pregnancy_icd10,
                     'pregnancy_description': patient.pregnancy_description,
+                    
+                    # Medical conditions
                     'comorbidity_icd10': patient.comorbidity_icd10,
                     'comorbidity_description': patient.comorbidity_description,
+                    'conditions': patient.get_conditions(),
+                    
+                    # Medications
+                    'medications': patient.get_medications_list(),
+                    'medication_notes': patient.medication_notes,
+                    'ndc_codes': patient.get_ndc_codes_list(),
+                    
+                    # Risk assessment
                     'risk_level': patient_risk_level,
                     'risk_score': risk_data['risk_score'],
                     'heat_wave_risk': risk_data.get('heat_wave_risk', False),
                     'risk_factors': risk_data.get('factors', {}),
                     'weather_conditions': risk_data.get('weather_data', {}),
-                    'medications': patient.get_medications_list(),
-                    'conditions': patient.get_conditions()
+                    
+                    # Additional patient flags
+                    'is_high_risk_age': patient.between_17_35,
+                    'age_group': 'optimal' if patient.between_17_35 else 'outside_optimal',
+                    
+                    # Timestamps
+                    'created_at': patient.created_at.isoformat() if patient.created_at else None,
+                    'updated_at': patient.updated_at.isoformat() if patient.updated_at else None
                 }
                 
                 # Add AI suggestions if requested
@@ -155,6 +175,7 @@ def get_patient_risk_details(patient_id):
         return jsonify({
             'success': True,
             'patient': {
+                # Basic patient information
                 'patient_id': patient.id,
                 'name': patient.name,
                 'age': patient.age,
@@ -162,13 +183,30 @@ def get_patient_risk_details(patient_id):
                 'phone_number': patient.phone_number,
                 'email': patient.email,
                 'address': patient.address,
+                
+                # Pregnancy information
                 'pregnancy_weeks': patient.weeks_pregnant,
+                'trimester': patient._calculate_trimester(),
                 'pregnancy_icd10': patient.pregnancy_icd10,
                 'pregnancy_description': patient.pregnancy_description,
+                
+                # Medical conditions
                 'comorbidity_icd10': patient.comorbidity_icd10,
                 'comorbidity_description': patient.comorbidity_description,
+                'conditions': patient.get_conditions(),
+                
+                # Medications
                 'medications': patient.get_medications_list(),
-                'conditions': patient.get_conditions()
+                'medication_notes': patient.medication_notes,
+                'ndc_codes': patient.get_ndc_codes_list(),
+                
+                # Additional patient flags
+                'is_high_risk_age': patient.between_17_35,
+                'age_group': 'optimal' if patient.between_17_35 else 'outside_optimal',
+                
+                # Timestamps
+                'created_at': patient.created_at.isoformat() if patient.created_at else None,
+                'updated_at': patient.updated_at.isoformat() if patient.updated_at else None
             },
             'current_risk': {
                 'risk_level': risk_data['risk_level'],

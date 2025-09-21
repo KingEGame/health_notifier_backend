@@ -1,0 +1,305 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Health Notifier Infrastructure - Complete AWS Setup'
+
+Parameters:
+  DBPassword:
+    Type: String
+    NoEcho: true
+    Description: Password for RDS MySQL database
+    MinLength: 8
+    MaxLength: 128
+    AllowedPattern: '[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{}|;:,.<>?]+'
+  
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access
+    
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    AllowedValues: [t2.micro, t2.small, t2.medium, t3.micro, t3.small]
+    Description: EC2 instance type
+    
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.micro
+    AllowedValues: [db.t3.micro, db.t3.small, db.t3.medium]
+    Description: RDS instance class
+
+Resources:
+  # VPC and Networking
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: HealthNotifier-VPC
+          
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: HealthNotifier-IGW
+          
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+      
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: HealthNotifier-Public-Subnet
+          
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: HealthNotifier-Private-Subnet
+          
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: HealthNotifier-Public-RT
+          
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet
+      
+  # Security Groups
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: health-notifier-ec2-sg
+      GroupDescription: Security group for Health Notifier EC2 instance
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: HTTP access
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: HTTPS access
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+          Description: SSH access
+      Tags:
+        - Key: Name
+          Value: HealthNotifier-EC2-SG
+          
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: health-notifier-rds-sg
+      GroupDescription: Security group for Health Notifier RDS
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref EC2SecurityGroup
+          Description: MySQL access from EC2
+      Tags:
+        - Key: Name
+          Value: HealthNotifier-RDS-SG
+          
+  # RDS Instance
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for Health Notifier RDS
+      SubnetIds: [!Ref PublicSubnet, !Ref PrivateSubnet]
+      Tags:
+        - Key: Name
+          Value: HealthNotifier-DB-SubnetGroup
+          
+  HealthNotifierDB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: health-notifier-db
+      DBInstanceClass: !Ref DBInstanceClass
+      Engine: mysql
+      EngineVersion: '8.0'
+      MasterUsername: admin
+      MasterUserPassword: !Ref DBPassword
+      AllocatedStorage: 20
+      StorageType: gp2
+      DBName: health_notifier
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VPCSecurityGroups: [!Ref RDSSecurityGroup]
+      BackupRetentionPeriod: 7
+      StorageEncrypted: true
+      DeletionProtection: false
+      Tags:
+        - Key: Name
+          Value: HealthNotifier-Database
+          
+  # EC2 Instance
+  HealthNotifierInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0c02fb55956c7d316  # Amazon Linux 2 AMI (HVM) - Kernel 5.10
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SecurityGroupIds: [!Ref EC2SecurityGroup]
+      SubnetId: !Ref PublicSubnet
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install python3 python3-pip git nginx mysql -y
+          
+          # Create application user
+          useradd -m appuser
+          
+          # Clone repository and setup application
+          sudo -u appuser bash << 'EOF'
+          cd /home/appuser
+          git clone https://github.com/yourusername/health-notifier.git health-notifier
+          cd health-notifier
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          pip install gunicorn
+          EOF
+          
+          # Create systemd service
+          cat > /etc/systemd/system/health-notifier.service << 'EOF'
+          [Unit]
+          Description=Health Notifier API
+          After=network.target
+          
+          [Service]
+          User=appuser
+          Group=appuser
+          WorkingDirectory=/home/appuser/health-notifier
+          Environment=PATH=/home/appuser/health-notifier/venv/bin
+          ExecStart=/home/appuser/health-notifier/venv/bin/gunicorn -w 4 -b 127.0.0.1:5000 wsgi:application
+          Restart=always
+          
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+          
+          # Configure Nginx
+          cat > /etc/nginx/conf.d/health-notifier.conf << 'EOF'
+          server {
+              listen 80;
+              server_name _;
+              
+              location / {
+                  proxy_pass http://127.0.0.1:5000;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+              }
+          }
+          EOF
+          
+          # Start services
+          systemctl enable nginx
+          systemctl start nginx
+          systemctl enable health-notifier
+          
+      Tags:
+        - Key: Name
+          Value: HealthNotifier-Instance
+          
+  # S3 Bucket for backups (optional)
+  BackupBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${AWS::StackName}-backups-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 30
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: HealthNotifier-Backups
+
+Outputs:
+  DatabaseEndpoint:
+    Description: RDS MySQL endpoint
+    Value: !GetAtt HealthNotifierDB.Endpoint.Address
+    Export:
+      Name: !Sub '${AWS::StackName}-DatabaseEndpoint'
+      
+  DatabasePort:
+    Description: RDS MySQL port
+    Value: !GetAtt HealthNotifierDB.Endpoint.Port
+    Export:
+      Name: !Sub '${AWS::StackName}-DatabasePort'
+      
+  InstancePublicIP:
+    Description: EC2 instance public IP
+    Value: !GetAtt HealthNotifierInstance.PublicIp
+    Export:
+      Name: !Sub '${AWS::StackName}-InstancePublicIP'
+      
+  InstancePublicDNS:
+    Description: EC2 instance public DNS
+    Value: !GetAtt HealthNotifierInstance.PublicDnsName
+    Export:
+      Name: !Sub '${AWS::StackName}-InstancePublicDNS'
+      
+  ApplicationURL:
+    Description: Application URL
+    Value: !Sub 'http://${HealthNotifierInstance.PublicIp}'
+    Export:
+      Name: !Sub '${AWS::StackName}-ApplicationURL'
+      
+  BackupBucketName:
+    Description: S3 bucket for backups
+    Value: !Ref BackupBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-BackupBucket'
+      
+  VPCId:
+    Description: VPC ID
+    Value: !Ref VPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VPCId'

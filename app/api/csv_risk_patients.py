@@ -16,8 +16,9 @@ def get_risk_patients():
         location = request.args.get('location')  # zip_code
         include_ai_suggestions = request.args.get('include_ai_suggestions', 'false').lower() == 'true'
         
-        # Get all patients
-        patients = csv_manager.get_all_patients()
+        # Get all patients and limit to first 10 for better performance
+        all_patients = csv_manager.get_all_patients()
+        patients = all_patients[:10]  # Limit to first 10 patients
         
         if not patients:
             return jsonify({
@@ -102,6 +103,8 @@ def get_risk_patients():
             'risk_patients': risk_patients,
             'summary': {
                 'total_patients': len(risk_patients),
+                'total_available_patients': len(all_patients),
+                'patients_limited_to': 10,
                 'risk_distribution': risk_distribution,
                 'patients_at_risk': patients_at_risk,
                 'filters_applied': {
@@ -189,13 +192,16 @@ def get_patient_risk_details(patient_id):
 def get_risk_summary():
     """Get summary of all patients' risk levels"""
     try:
-        patients = csv_manager.get_all_patients()
+        all_patients = csv_manager.get_all_patients()
+        patients = all_patients[:10]  # Limit to first 10 patients for performance
         
         if not patients:
             return jsonify({
                 'success': True,
                 'summary': {
                     'total_patients': 0,
+                    'total_available_patients': 0,
+                    'patients_limited_to': 10,
                     'risk_distribution': {'low': 0, 'medium': 0, 'high': 0},
                     'patients_at_risk': 0,
                     'extreme_heat_risk': 0,
@@ -235,6 +241,8 @@ def get_risk_summary():
             'success': True,
             'summary': {
                 'total_patients': len(patients),
+                'total_available_patients': len(all_patients),
+                'patients_limited_to': 10,
                 'risk_distribution': risk_distribution,
                 'patients_at_risk': patients_at_risk,
                 'extreme_heat_risk': extreme_heat_risk,

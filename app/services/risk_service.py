@@ -78,27 +78,21 @@ class RiskAssessmentService:
         risk_score += trimester_risk['score']
         factors['trimester_risk'] = trimester_risk['level']
         
-        # Location factor (weather)
-        try:
-            weather_data = WeatherService.get_weather_data(patient.zip_code)
-            location_risk = RiskAssessmentService._calculate_location_risk(weather_data)
-            risk_score += location_risk['score']
-            factors['location_risk'] = location_risk['level']
-            factors['heat_wave'] = weather_data['is_heat_wave']
-        except ExternalAPIException:
-            # If weather service is unavailable, use medium risk
-            risk_score += 1
-            factors['location_risk'] = 'medium'
-            factors['heat_wave'] = False
-            weather_data = {
-                'temperature': 25,
-                'feels_like': 25,
-                'humidity': 50,
-                'pressure': 1013,
-                'description': 'Unknown',
-                'is_heat_wave': False,
-                'heat_index': 25
-            }
+        # Location factor (weather) - temporarily disabled
+        # Use default weather data to prevent API hanging
+        weather_data = {
+            'temperature': 25,
+            'feels_like': 25,
+            'humidity': 50,
+            'pressure': 1013,
+            'description': 'Weather API disabled',
+            'is_heat_wave': False,
+            'heat_index': 25
+        }
+        location_risk = RiskAssessmentService._calculate_location_risk(weather_data)
+        risk_score += location_risk['score']
+        factors['location_risk'] = location_risk['level']
+        factors['heat_wave'] = weather_data['is_heat_wave']
         
         # Conditions factor
         conditions_risk = RiskAssessmentService._calculate_conditions_risk(patient)
@@ -239,8 +233,16 @@ class RiskAssessmentService:
             # Get basic risk assessment
             risk_data = RiskAssessmentService.assess_risk(patient)
             
-            # Get weather data
-            weather_data = WeatherService.get_weather_data(patient.zip_code)
+            # Get weather data - temporarily disabled
+            weather_data = {
+                'temperature': 25,
+                'feels_like': 25,
+                'humidity': 50,
+                'pressure': 1013,
+                'description': 'Weather API disabled',
+                'is_heat_wave': False,
+                'heat_index': 25
+            }
             
             # Calculate additional risk factors
             additional_factors = RiskAssessmentService._calculate_additional_risk_factors(patient, weather_data)

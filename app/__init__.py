@@ -6,7 +6,7 @@ import os
 # Add the project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config import config
+from app.config import config
 
 def create_app(config_name='development'):
     app = Flask(__name__)

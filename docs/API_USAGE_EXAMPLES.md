@@ -144,7 +144,7 @@ GET /api/weather-ai-analysis/101000
 
 ### 3. Patients with Risk Assessment
 
-#### Get all patients with risks
+#### Get all patients with risks (Limited to 10 patients for performance)
 ```bash
 GET /api/risk-patients
 ```
@@ -158,6 +158,86 @@ GET /api/risk-patients
 ```bash
 GET /api/risk-patients?risk_level=high&include_ai_suggestions=true
 ```
+
+**Response:**
+```json
+{
+  "success": true,
+  "risk_patients": [
+    {
+      "patient_id": 1,
+      "name": "Mia Clark",
+      "age": 34,
+      "zip_code": "10301",
+      "phone_number": "+1-555-0123",
+      "email": "mia.clark@email.com",
+      "address": "123 Main St, New York, NY",
+      
+      "pregnancy_weeks": 34,
+      "trimester": 3,
+      "pregnancy_icd10": "O09.5",
+      "pregnancy_description": "Supervision of elderly primigravida",
+      
+      "comorbidity_icd10": "I10",
+      "comorbidity_description": "Essential hypertension",
+      "conditions": [
+        "O09.5: Supervision of elderly primigravida",
+        "I10: Essential hypertension"
+      ],
+      
+      "medications": ["Labetalol"],
+      "medication_notes": "For hypertension management",
+      "ndc_codes": ["00173-0834-01"],
+      
+      "risk_level": "high",
+      "risk_score": 13,
+      "heat_wave_risk": false,
+      "risk_factors": {
+        "age_risk": "high",
+        "trimester_risk": "high",
+        "location_risk": "low",
+        "conditions_risk": "high",
+        "medications_risk": "high"
+      },
+      "weather_conditions": {
+        "temperature": 25,
+        "description": "Weather API disabled"
+      },
+      
+      "is_high_risk_age": false,
+      "age_group": "outside_optimal",
+      
+      "created_at": "2025-09-21T15:30:06.125059",
+      "updated_at": "2025-09-21T15:30:06.125059"
+    }
+  ],
+  "summary": {
+    "total_patients": 10,
+    "total_available_patients": 1000,
+    "patients_limited_to": 10,
+    "risk_distribution": {
+      "high": 10,
+      "medium": 0,
+      "low": 0
+    },
+    "patients_at_risk": 10,
+    "filters_applied": {
+      "risk_level": null,
+      "location": null,
+      "include_ai_suggestions": false
+    }
+  }
+}
+```
+
+**Key Features:**
+- **Performance Optimized**: Returns only first 10 patients for fast response
+- **Comprehensive Patient Data**: Includes detailed medical information
+- **Risk Assessment**: Complete risk analysis with scoring
+- **Medical Details**: Medications, conditions, NDC codes
+- **Pregnancy Information**: Weeks, trimester calculation, ICD10 codes
+- **Contact Information**: Full patient contact details
+- **Timestamps**: Creation and update tracking
 
 #### Get risk details for specific patient
 ```bash

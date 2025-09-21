@@ -17,8 +17,10 @@ class AIService:
             if not api_key:
                 raise ExternalAPIException("Gemini API key not configured")
             
+            model_name = current_app.config.get('GEMINI_MODEL', 'gemini-2.0-flash-exp')
+            
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-2.5-flash')
+            model = genai.GenerativeModel(model_name)
             
             # Prepare patient context
             patient_context = AIService._prepare_patient_context(patient, risk_data)
@@ -46,8 +48,10 @@ class AIService:
             if not api_key:
                 raise ExternalAPIException("Gemini API key not configured")
             
+            model_name = current_app.config.get('GEMINI_MODEL', 'gemini-2.0-flash-exp')
+            
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-2.5-flash')
+            model = genai.GenerativeModel(model_name)
             
             prompt = f"""
             Analyze the following weather conditions for pregnant women health risks:
@@ -85,8 +89,10 @@ class AIService:
             if not api_key:
                 raise ExternalAPIException("Gemini API key not configured")
             
+            model_name = current_app.config.get('GEMINI_MODEL', 'gemini-2.0-flash-exp')
+            
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-pro')
+            model = genai.GenerativeModel(model_name)
             
             patient_context = AIService._prepare_patient_context(patient, risk_data)
             

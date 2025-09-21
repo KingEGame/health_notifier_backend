@@ -285,9 +285,19 @@ To work with AI and weather data, you need to configure the following environmen
 # OpenWeather API key
 WEATHER_API_KEY=your_openweather_api_key_here
 
-# Google Gemini API key
+# Google Gemini API configuration
 GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.0-flash-exp
 ```
+
+### Available Gemini Models
+
+You can configure different Gemini models by setting the `GEMINI_MODEL` environment variable:
+
+- `gemini-2.0-flash-exp` (default) - Latest experimental model
+- `gemini-1.5-pro` - Pro model with advanced capabilities
+- `gemini-1.5-flash` - Fast model for quick responses
+- `gemini-pro` - Standard model (legacy)
 
 ## Usage Features
 

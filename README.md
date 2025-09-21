@@ -122,6 +122,7 @@ DB_NAME=health_notifier
 
 # External APIs
 GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.0-flash-exp
 WEATHER_API_KEY=your_weather_key
 
 # Application settings
@@ -137,7 +138,14 @@ FLASK_DEBUG=True
    - Create a new API key
    - Copy the key to `GEMINI_API_KEY` variable
 
-2. **Weather API Key**:
+2. **Gemini Model Configuration**:
+   - Set `GEMINI_MODEL` to choose the AI model:
+     - `gemini-2.0-flash-exp` (default) - Latest experimental model
+     - `gemini-1.5-pro` - Pro model with advanced capabilities
+     - `gemini-1.5-flash` - Fast model for quick responses
+     - `gemini-pro` - Standard model (legacy)
+
+3. **Weather API Key**:
    - Register at https://openweathermap.org/api
    - Get a free API key
    - Copy the key to `WEATHER_API_KEY` variable

@@ -11,6 +11,11 @@ class Config:
     GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
     GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-2.0-flash-exp')
     WEATHER_API_KEY = os.environ.get('WEATHER_API_KEY')
+    
+    # Logging configuration
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    LOG_FILE = os.environ.get('LOG_FILE', 'app.log')
 
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -20,11 +25,15 @@ class DevelopmentConfig(Config):
     DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
     DB_NAME = os.environ.get('DB_NAME', 'health_notifier')
     
-    # Поддержка порта для AWS RDS
-    if DB_PORT and DB_PORT != '3306':
-        SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    # Use SQLite for development if MySQL is not available
+    if os.environ.get('USE_SQLITE', 'false').lower() == 'true':
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///health_notifier.db'
     else:
-        SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+        # Поддержка порта для AWS RDS
+        if DB_PORT and DB_PORT != '3306':
+            SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+        else:
+            SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
 
 class ProductionConfig(Config):
     DEBUG = False

@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from app.extensions import db
 from app.services import WeatherService
 from datetime import datetime
 import logging
+from sqlalchemy import text
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ def health_check():
     """Health check endpoint"""
     try:
         # Test database connection
-        db.session.execute('SELECT 1')
+        db.session.execute(text('SELECT 1'))
         
         return jsonify({
             'success': True,
@@ -46,7 +47,7 @@ def detailed_health_check():
         
         # Database check
         try:
-            db.session.execute('SELECT 1')
+            db.session.execute(text('SELECT 1'))
             health_status['components']['database'] = {
                 'status': 'healthy',
                 'message': 'Database connection successful'
